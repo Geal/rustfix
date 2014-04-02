@@ -105,7 +105,7 @@ def proceed(name, project):
     forked_repo = fork(remote)
     forked      = GithubRepo(name, project)
     local       = clone(forked)
-    head        = branch(local, "easyfix")
+    head        = branch(local, "rustfix")
     files       = findFiles(os.path.expanduser("./"+remote.username+"-"+remote.repository_name), "*.rs")
     #print files
 
