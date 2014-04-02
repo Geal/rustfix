@@ -5,6 +5,8 @@ from git import Repo
 from github import Github
 from ConfigParser import SafeConfigParser
 
+from codefixes import fixes
+
 class Config:
     current_path = path = os.path.abspath(os.path.dirname(sys.argv[0]))
     parser = SafeConfigParser()
@@ -106,35 +108,10 @@ def proceed(name, project):
     head        = branch(local, "easyfix")
     files       = findFiles(os.path.expanduser("./"+remote.username+"-"+remote.repository_name), "*.rs")
     #print files
-    arr         = []
-    fix         = CodeFix("attribute fix", r'(#\[)(.*)(\];)', r'#![\2]')
-    fix2        = CodeFix("priv attribute removal", r'(priv )', r'')
-    fix3        = CodeFix("extern mod is obsolete", r'extern mod', r'extern crate')
-    def crate_replace(matchobj):
-        if matchobj.group(0) == '':
-            return ''
-        crates = Set(matchobj.group('crates').split('\n'))
-        if(len(crates) == 0):
-            return ''
-        crates.remove("extern crate extra;")
-        other_crates = re.findall(r"extra::(.*?)(::|;)", matchobj.group("rest"))
-        for cr in other_crates:
-            crates.add("extern crate "+cr[0]+";")
 
-        rest = re.sub(r"extra::", r"", matchobj.group("rest"), flags = re.DOTALL | re.MULTILINE)
-        res = ""
-        for el in crates:
-            res += el+"\n"
-        return res + rest
-
-    fix4        = CodeFix("crate extra was removed", r'(?P<crates>(?P<extern>extern crate .*?;\n)+)(?P<rest>.*)',crate_replace)
-    arr.append(fix)
-    arr.append(fix2)
-    arr.append(fix3)
-    arr.append(fix4)
     res = Set([])
     for f in files:
-        s = applyToFile(f, arr)
+        s = applyToFile(f, fixes)
         res.update(s)
 
     msg = "Automated fixes to follow Rust development\n\nApplied fixes:\n"
