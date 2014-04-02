@@ -22,15 +22,17 @@ def crate_replace(matchobj):
     if "extern crate extra;" in crates:
         crates.remove("extern crate extra;")
 
-    other_crates = re.findall(r"extra::(.*?)(::|;)", matchobj.group("rest"))
-    for cr in other_crates:
-        crates.add("extern crate "+cr[0]+";")
+        other_crates = re.findall(r"extra::(.*?)(::|;)", matchobj.group("rest"))
+        for cr in other_crates:
+            crates.add("extern crate "+cr[0]+";")
 
-    rest = re.sub(r"extra::", r"", matchobj.group("rest"), flags = re.DOTALL | re.MULTILINE)
-    res = ""
-    for el in crates:
-        res += el+"\n"
-    return res + rest
+        rest = re.sub(r"extra::", r"", matchobj.group("rest"), flags = re.DOTALL | re.MULTILINE)
+        res = ""
+        for el in crates:
+            res += el+"\n"
+        return res + rest
+    else:
+        return matchobj.group('crates') + matchobj.group("rest")
 
 fix4        = CodeFix("crate extra was removed", r'(?P<crates>(?P<extern>extern crate .*?;\n)+)(?P<rest>.*)',crate_replace)
 
