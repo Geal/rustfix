@@ -148,4 +148,6 @@ Here are the fixes applied:
     print "pull request generated for "+name+"/"+project+" with id number "+str(pull_request.id)
     return local
 
-proceed("divarvel", "rusty-spoon")
+
+if __name__ == "__main__":
+    proceed(sys.argv[1], sys.argv[2])
