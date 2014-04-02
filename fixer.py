@@ -82,8 +82,8 @@ def applyToFile(filename, fixes_array):
         text = f.read()
         for fix in fixes_array:
             print filename+":\tapplying '"+fix.description+"'"
-            #print " -> "+str(re.subn(fix.search, fix.replace, text))
-            text2 = re.sub(fix.search, fix.replace, text)
+            #print " -> "+str(re.subn(fix.search, fix.replace, text, flags = re.DOTALL | re.MULTILINE))
+            text2 = re.sub(fix.search, fix.replace, text, flags = re.DOTALL | re.MULTILINE)
             if text != text2:
                 res.add(fix.description)
                 text = text2
@@ -105,9 +105,28 @@ def proceed(name, project):
     fix         = CodeFix("attribute fix", r'(#\[)(.*)(\];)', r'#![\2]')
     fix2        = CodeFix("priv attribute removal", r'(priv )', r'')
     fix3        = CodeFix("extern mod is obsolete", r'extern mod', r'extern crate')
+    def crate_replace(matchobj):
+        if matchobj.group(0) == '':
+            return ''
+        crates = Set(matchobj.group('crates').split('\n'))
+        if(len(crates) == 0):
+            return ''
+        crates.remove("extern crate extra;")
+        other_crates = re.findall(r"extra::(.*?)(::|;)", matchobj.group("rest"))
+        for cr in other_crates:
+            crates.add("extern crate "+cr[0]+";")
+
+        rest = re.sub(r"extra::", r"", matchobj.group("rest"), flags = re.DOTALL | re.MULTILINE)
+        res = ""
+        for el in crates:
+            res += el+"\n"
+        return res + rest
+
+    fix4        = CodeFix("crate extra was removed", r'(?P<crates>(?P<extern>extern crate .*?;\n)+)(?P<rest>.*)',crate_replace)
     arr.append(fix)
     arr.append(fix2)
     arr.append(fix3)
+    arr.append(fix4)
     res = Set([])
     for f in files:
         s = applyToFile(f, arr)
