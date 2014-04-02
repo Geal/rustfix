@@ -143,7 +143,7 @@ Those changes were applied automatically to spare you the tedious search and rep
 
 This is still in testing, and will not replace manual compilation (but will probably remove the annoying part). This may not compile out of the box, because that script does not analyze the type (yet). It may even break some code, so please review the diff carefully before merging.
 
-If you do not want to receive those kinds of pull requests, I apologize forthis annoying notification and will not bother you again with this.
+If you do not want to receive those kinds of pull requests, I apologize for this annoying notification and will not bother you again with this.
 If you have ideas about how to improve that system, you can check it out at https://github.com/Geal/rustfix
 
 You can reach me here on Github, on Twitter by the nickname 'gcouprie', or on IRC (Freenode, Mozilla, etc) by the nickname 'geal'.
