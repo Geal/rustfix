@@ -36,7 +36,29 @@ def crate_replace(matchobj):
 
 fix4        = CodeFix("crate extra was removed", r'(?P<crates>(?P<extern>extern crate .*?;\n)+)(?P<rest>.*)',crate_replace)
 
+def import_crate_log(matchobj):
+    if matchobj.group(0) == '':
+        return ''
+    crates = Set(matchobj.group('crates').split('\n'))
+    if(len(crates) == 0):
+        return ''
+
+    macros = re.findall(r"(error\!|debug\!|info\!|log\!|log_enabled\!|warn\!)", matchobj.group("rest"))
+    if (len(macros) > 0) and ("extern crate log;" not in crates):
+        crates.add("extern crate log;")
+
+        res = "#![feature(phase)]\n#[phase(syntax, link)]\nextern crate log;\n"
+        res += matchobj.group('crates')
+        #for el in crates:
+        #    res += el+"\n"
+        return res + matchobj.group("rest")
+    else:
+        return matchobj.group('crates') + matchobj.group("rest")
+
+fix5        = CodeFix("logging macros need the log crate", r'(?P<crates>(?P<extern>extern crate .*?;\n)+)(?P<rest>.*)', import_crate_log)
+
 fixes.append(fix)
 fixes.append(fix2)
 fixes.append(fix3)
 fixes.append(fix4)
+fixes.append(fix5)
