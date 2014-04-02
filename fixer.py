@@ -1,4 +1,5 @@
 import os,sys,random,string,fnmatch,re
+import git
 from git import Repo
 from github import Github
 from ConfigParser import SafeConfigParser
@@ -25,10 +26,21 @@ class CodeFix:
         self.replace     = replace
 
 def clone(github_repo):
-    print "cloning "+github_repo.username+"/"+github_repo.repository_name
-    r = Repo.clone_from("https://github.com/"+github_repo.username+"/"+github_repo.repository_name, os.path.expanduser("./"+github_repo.repository_name))
-    print "done"
-    return r
+    try:
+        print "cloning "+github_repo.username+"/"+github_repo.repository_name
+        r = Repo.clone_from("https://github.com/"+github_repo.username+"/"+github_repo.repository_name, os.path.expanduser("./"+github_repo.username+"-"+github_repo.repository_name))
+        # FIXME add the token here
+        test_remote = r.create_remote('geal',  "https://github.com/Geal/"+github_repo.repository_name)
+        print "done"
+        return r
+    except git.exc.GitCommandError:
+        print "already locally cloned, pulling recent changes"
+        r = Repo(os.path.expanduser("./"+github_repo.username+"-"+github_repo.repository_name))
+        r.heads.master.checkout()
+        origin = r.remotes.origin
+        origin.pull()
+        print "done"
+        return r
 
 def branch(repo, fixname):
     rnd = ''.join([random.choice(string.ascii_letters + string.digits) for n in xrange(5)])
@@ -76,14 +88,16 @@ def applyToFile(filename, fixes_array):
 def proceed(name, project):
     remote      = GithubRepo(name, project)
     forked_repo = fork(remote)
-    forked      = GithubRepo("Geal", project)
+    forked      = GithubRepo(name, project)
     local       = clone(forked)
     head        = branch(local, "easyfix")
-    files       = findFiles(os.path.expanduser("./"+forked.repository_name), "*.rs")
+    files       = findFiles(os.path.expanduser("./"+remote.username+"-"+remote.repository_name), "*.rs")
+    print files
     arr         = []
     fix         = CodeFix("attribute fix", r'^(#[)(.*)(];)', r'#![\2]')
-    fix         = CodeFix("priv attribute removal", r'(priv )', r'')
+    fix2        = CodeFix("priv attribute removal", r'(priv )', r'')
     arr.append(fix)
+    arr.append(fix2)
     for f in files:
         applyToFile(f, arr)
 
