@@ -146,7 +146,7 @@ This is still in testing, and will not replace manual compilation (but will prob
 If you do not want to receive those kinds of pull requests, I apologize forthis annoying notification and will not bother you again with this.
 If you have ideas about how to improve that system, you can check it out at https://github.com/Geal/rustfix
 
-You can reach me here on Github, or on IRC (Freenode, Mozilla, etc) by the nickname 'geal'.
+You can reach me here on Github, on Twitter by the nickname 'gcouprie', or on IRC (Freenode, Mozilla, etc) by the nickname 'geal'.
 
 Here are the fixes applied:
 
