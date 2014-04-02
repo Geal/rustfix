@@ -100,10 +100,11 @@ def proceed(name, project):
     local       = clone(forked)
     head        = branch(local, "easyfix")
     files       = findFiles(os.path.expanduser("./"+remote.username+"-"+remote.repository_name), "*.rs")
-    print files
+    #print files
     arr         = []
-    fix         = CodeFix("attribute fix", r'^(#[)(.*)(];)', r'#![\2]')
+    fix         = CodeFix("attribute fix", r'(#\[)(.*)(\];)', r'#![\2]')
     fix2        = CodeFix("priv attribute removal", r'(priv )', r'')
+    fix3        = CodeFix("extern mod is obsolete", r'extern mod', r'extern crate')
     arr.append(fix)
     arr.append(fix2)
     arr.append(fix3)
@@ -116,4 +117,5 @@ def proceed(name, project):
         print "fix applied: "+el
     return local
 
-proceed("andelf", "rust-iconv")
+#proceed("andelf", "rust-iconv")
+proceed("divarvel", "rusty-spoon")
