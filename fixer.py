@@ -1,4 +1,5 @@
 import os,sys,random,string,fnmatch,re
+from sets import Set
 import git
 from git import Repo
 from github import Github
@@ -76,14 +77,21 @@ def findFiles(folder, pattern):
     return matches
 
 def applyToFile(filename, fixes_array):
+    res = Set([])
     with open(filename,'r+') as f:
         text = f.read()
         for fix in fixes_array:
-            print "applying "+fix.description+"..."
-            text = re.sub(fix.search, fix.replace, text)
-            f.seek(0)
-            f.write(text)
-            f.truncate()
+            print filename+":\tapplying '"+fix.description+"'"
+            #print " -> "+str(re.subn(fix.search, fix.replace, text))
+            text2 = re.sub(fix.search, fix.replace, text)
+            if text != text2:
+                res.add(fix.description)
+                text = text2
+                f.seek(0)
+                f.write(text)
+                f.truncate()
+
+    return res
 
 def proceed(name, project):
     remote      = GithubRepo(name, project)
@@ -98,9 +106,14 @@ def proceed(name, project):
     fix2        = CodeFix("priv attribute removal", r'(priv )', r'')
     arr.append(fix)
     arr.append(fix2)
+    arr.append(fix3)
+    res = Set([])
     for f in files:
-        applyToFile(f, arr)
+        s = applyToFile(f, arr)
+        res.update(s)
 
+    for el in res:
+        print "fix applied: "+el
     return local
 
 proceed("andelf", "rust-iconv")
