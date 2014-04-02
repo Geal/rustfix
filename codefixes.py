@@ -18,7 +18,10 @@ def crate_replace(matchobj):
     crates = Set(matchobj.group('crates').split('\n'))
     if(len(crates) == 0):
         return ''
-    crates.remove("extern crate extra;")
+
+    if "extern crate extra;" in crates:
+        crates.remove("extern crate extra;")
+
     other_crates = re.findall(r"extra::(.*?)(::|;)", matchobj.group("rest"))
     for cr in other_crates:
         crates.add("extern crate "+cr[0]+";")
