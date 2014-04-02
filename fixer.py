@@ -100,7 +100,7 @@ def applyToFile(filename, fixes_array):
 
     return res
 
-def proceed(name, project):
+def proceed(option, name, project):
     remote      = GithubRepo(name, project)
     forked_repo = fork(remote)
     forked      = GithubRepo(name, project)
@@ -116,7 +116,11 @@ def proceed(name, project):
 
     msg = "Automated fixes to follow Rust development\n\nApplied fixes:\n"
     for el in res:
+        print "applied "+el
         msg += "\t*"+el+"\n"
+
+    if option == "testfix":
+        return
 
     index = local.index
     for (path, stage), entry in index.entries.iteritems():
@@ -127,6 +131,9 @@ def proceed(name, project):
     geal_origin = local.remotes.geal
     refspec = "refs/heads/"+head+":refs/heads/"+head
     geal_origin.push(refspec)
+
+    if option == "commit":
+        return
 
     title = "Automated fixes to follow Rust development"
     body  = """Hi,
@@ -150,4 +157,4 @@ Here are the fixes applied:
 
 
 if __name__ == "__main__":
-    proceed(sys.argv[1], sys.argv[2])
+    proceed(sys.argv[1], sys.argv[2], sys.argv[3])
