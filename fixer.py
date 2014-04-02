@@ -1,4 +1,4 @@
-import os,sys,random,string
+import os,sys,random,string,fnmatch,re
 from git import Repo
 from github import Github
 from ConfigParser import SafeConfigParser
@@ -17,6 +17,12 @@ class GithubRepo:
     def __init__(self, username, repository_name):
         self.username        = username
         self.repository_name = repository_name
+
+class CodeFix:
+    def __init__(self, description, search, replace):
+        self.description = description
+        self.search      = search
+        self.replace     = replace
 
 def clone(github_repo):
     print "cloning "+github_repo.username+"/"+github_repo.repository_name
@@ -49,12 +55,38 @@ def fork(github_repo):
 #print "deleting "+r2.full_name
 #r2.delete()
 
+def findFiles(folder, pattern):
+    print "looking for "+pattern+" in "+folder
+    matches = []
+    for root, dirnames, filenames in os.walk(folder):
+      for filename in fnmatch.filter(filenames, pattern):
+          matches.append(os.path.join(root, filename))
+    return matches
+
+def applyToFile(filename, fixes_array):
+    with open(filename,'r+') as f:
+        text = f.read()
+        for fix in fixes_array:
+            print "applying "+fix.description+"..."
+            text = re.sub(fix.search, fix.replace, text)
+            f.seek(0)
+            f.write(text)
+            f.truncate()
+
 def proceed(name, project):
     remote      = GithubRepo(name, project)
     forked_repo = fork(remote)
     forked      = GithubRepo("Geal", project)
     local       = clone(forked)
     head        = branch(local, "easyfix")
+    files       = findFiles(os.path.expanduser("./"+forked.repository_name), "*.rs")
+    arr         = []
+    fix         = CodeFix("attribute fix", r'^(#[)(.*)(];)', r'#![\2]')
+    fix         = CodeFix("priv attribute removal", r'(priv )', r'')
+    arr.append(fix)
+    for f in files:
+        applyToFile(f, arr)
+
     return local
 
 proceed("andelf", "rust-iconv")
