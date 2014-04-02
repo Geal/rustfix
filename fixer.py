@@ -137,10 +137,15 @@ def proceed(option, name, project):
 
     title = "Automated fixes to follow Rust development"
     body  = """Hi,
-This is an automated pull request to help you follow recent Rust developments.
-Those changes were applied to spare you the tedious search and replace work needed.
 
-If you do not want to receive those kinds of pull requests, please say so and I'll ignore your repository.
+This is an automated pull request to help you follow recent Rust developments.
+Those changes were applied automatically to spare you the tedious search and replace work needed.
+
+This is still in testing, and will not replace manual compilation (but will probably remove the annoying part).
+
+If you do not want to receive those kinds of pull requests, I apologize forthis annoying notification and will not bother you again with this.
+If you have ideas about how to improve that system, you can check it out at https://github.com/Geal/rustfix
+
 You can reach me here on Github, or on IRC (Freenode, Mozilla, etc) by the nickname 'geal'.
 
 Here are the fixes applied:
@@ -150,6 +155,7 @@ Here are the fixes applied:
         body += "\t*"+el+"\n"
 
     body += "\nCheers!"
+
     print "creating a pull request with base: master and head: "+"Geal:"+head
     pull_request = githubrepo(remote).create_pull(title, body, "master", "Geal:"+head)
     print "pull request generated for "+name+"/"+project+" with id number "+str(pull_request.id)
