@@ -53,6 +53,11 @@ def branch(repo, fixname):
     return branch_name
 
 
+def githubrepo(repo):
+    g = Github(Config.getToken())
+    r = g.get_repo(repo.username+"/"+repo.repository_name)
+    return r
+
 def fork(github_repo):
     g = Github(Config.getToken())
 ##for repo in g.get_user().get_repos():
@@ -146,6 +151,24 @@ def proceed(name, project):
     refspec = "refs/heads/"+head+":refs/heads/"+head
     geal_origin.push(refspec)
 
+    title = "Automated fixes to follow Rust development"
+    body  = """Hi,
+This is an automated pull request to help you follow recent Rust developments.
+Those changes were applied to spare you the tedious search and replace work needed.
+
+If you do not want to receive those kinds of pull requests, please say so and I'll ignore your repository.
+You can reach me here on Github, or on IRC (Freenode, Mozilla, etc) by the nickname 'geal'.
+
+Here are the fixes applied:
+
+"""
+    for el in res:
+        body += "\t*"+el+"\n"
+
+    body += "\nCheers!"
+    print "creating a pull request with base: master and head: "+"Geal:"+head
+    pull_request = githubrepo(remote).create_pull(title, body, "master", "Geal:"+head)
+    print "pull request generated for "+name+"/"+project+" with id number "+str(pull_request.id)
     return local
 
 proceed("divarvel", "rusty-spoon")
