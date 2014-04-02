@@ -132,9 +132,17 @@ def proceed(name, project):
         s = applyToFile(f, arr)
         res.update(s)
 
+    msg = "Automated fixes to follow Rust development\n\nApplied fixes:\n"
     for el in res:
-        print "fix applied: "+el
+        msg += "\t*"+el+"\n"
+
+    index = local.index
+    for (path, stage), entry in index.entries.iteritems():
+        #print "adding "+path+" for stage: "+str(stage)
+        index.add([path])
+
+    new_commit = index.commit(msg)
+
     return local
 
-#proceed("andelf", "rust-iconv")
 proceed("divarvel", "rusty-spoon")
