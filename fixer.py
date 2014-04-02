@@ -9,7 +9,6 @@ class Config:
 
     @classmethod
     def getToken(cls):
-        print "config_path "+cls.current_path+"/settings.ini"
         cls.parser.read(cls.current_path+"/settings.ini")
         section = "credentials"
         return cls.parser.get(section, "github_token")
@@ -35,21 +34,27 @@ def branch(repo, fixname):
     print "done"
 
 
-#remote = GithubRepo("andelf", "rust-iconv")
-#repo   = clone(remote)
-#branch(repo, "easyfix")
-#print repo.head.name
-
-#print Config.getToken()
-#g = Github(token)
+def fork(github_repo):
+    g = Github(Config.getToken())
 ##for repo in g.get_user().get_repos():
 ##    print repo.name
 
-#r = g.get_repo("alexcrichton/rust-compress")
-#print r.full_name
+    r = g.get_repo(github_repo.username+"/"+github_repo.repository_name)
+    print "forking "+r.full_name
+    print "from url: "+r.clone_url
+    u = g.get_user()
+    forked = u.create_fork(r)
+    return forked
 
-#u = g.get_user()
-#r2 = u.create_fork(r)
 #print "deleting "+r2.full_name
 #r2.delete()
 
+def proceed(name, project):
+    remote      = GithubRepo(name, project)
+    forked_repo = fork(remote)
+    forked      = GithubRepo("Geal", project)
+    local       = clone(forked)
+    head        = branch(local, "easyfix")
+    return local
+
+proceed("andelf", "rust-iconv")
