@@ -9,7 +9,7 @@ class CodeFix:
 
 fixes = []
 fix   = CodeFix("attribute fix (cf mozilla/rust#2569)", r'(#\[)([^\]]*?)(\];)', r'#![\2]')
-fix2  = CodeFix("priv attribute removal", r'(priv )', r'')
+fix2  = CodeFix("priv attribute removal (cf mozilla/rust@f2a5c7a179ab0fc0e415918c1fc5d280a9e02ede)", r'(priv )', r'')
 fix3  = CodeFix("extern mod is obsolete", r'extern mod', r'extern crate')
 
 def crate_replace(matchobj):
