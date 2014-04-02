@@ -30,8 +30,7 @@ def clone(github_repo):
     try:
         print "cloning "+github_repo.username+"/"+github_repo.repository_name
         r = Repo.clone_from("https://github.com/"+github_repo.username+"/"+github_repo.repository_name, os.path.expanduser("./"+github_repo.username+"-"+github_repo.repository_name))
-        # FIXME add the token here
-        test_remote = r.create_remote('geal',  "https://github.com/Geal/"+github_repo.repository_name)
+        test_remote = r.create_remote('geal',  "https://Geal:"+Config.getToken()+"@github.com/Geal/"+github_repo.repository_name)
         print "done"
         return r
     except git.exc.GitCommandError:
@@ -51,6 +50,7 @@ def branch(repo, fixname):
     print "checkout to "+new_branch.name
     new_branch.checkout()
     print "done"
+    return branch_name
 
 
 def fork(github_repo):
@@ -142,6 +142,9 @@ def proceed(name, project):
         index.add([path])
 
     new_commit = index.commit(msg)
+    geal_origin = local.remotes.geal
+    refspec = "refs/heads/"+head+":refs/heads/"+head
+    geal_origin.push(refspec)
 
     return local
 
