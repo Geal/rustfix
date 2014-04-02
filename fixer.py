@@ -141,7 +141,7 @@ def proceed(option, name, project):
 This is an automated pull request to help you follow recent Rust developments.
 Those changes were applied automatically to spare you the tedious search and replace work needed.
 
-This is still in testing, and will not replace manual compilation (but will probably remove the annoying part).
+This is still in testing, and will not replace manual compilation (but will probably remove the annoying part). This may not compile out of the box, because that script does not analyze the type (yet)
 
 If you do not want to receive those kinds of pull requests, I apologize forthis annoying notification and will not bother you again with this.
 If you have ideas about how to improve that system, you can check it out at https://github.com/Geal/rustfix
