@@ -34,7 +34,7 @@ def crate_replace(matchobj):
     else:
         return matchobj.group('crates') + matchobj.group("rest")
 
-fix4        = CodeFix("crate extra was removed", r'(?P<crates>(?P<extern>extern crate .*?;\n)+)(?P<rest>.*)',crate_replace)
+fix4 = CodeFix("crate extra was removed", r'(?P<crates>(?P<extern>extern crate .*?;\n)+)(?P<rest>.*)',crate_replace)
 
 def import_crate_log(matchobj):
     if matchobj.group(0) == '':
@@ -55,10 +55,17 @@ def import_crate_log(matchobj):
     else:
         return matchobj.group('crates') + matchobj.group("rest")
 
-fix5        = CodeFix("logging macros need the log crate", r'(?P<crates>(?P<extern>extern crate .*?;\n)+)(?P<rest>.*)', import_crate_log)
+fix5 = CodeFix("logging macros need the log crate", r'(?P<crates>(?P<extern>extern crate .*?;\n)+)(?P<rest>.*)', import_crate_log)
+
+fix6 = CodeFix("update the channel constructor (cf mozilla/rust@78580651131c9daacd7e5e4669af819cdd719f09)", r'Chan::new', r'comm::channel')
+fix7 = CodeFix("Rename Chan to Sender (cf mozilla/rust@78580651131c9daacd7e5e4669af819cdd719f09)", r'Chan', r'Sender')
+fix8 = CodeFix("Rename Port to Receiver (cf mozilla/rust@78580651131c9daacd7e5e4669af819cdd719f09)", r'Port', r'Receiver')
 
 fixes.append(fix)
 fixes.append(fix2)
 fixes.append(fix3)
 fixes.append(fix4)
 fixes.append(fix5)
+fixes.append(fix6)
+fixes.append(fix7)
+fixes.append(fix8)
