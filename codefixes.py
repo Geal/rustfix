@@ -63,6 +63,19 @@ fix8 = CodeFix("Rename Port to Receiver (cf mozilla/rust@78580651131c9daacd7e5e4
 fix9 = CodeFix("New vec library (cf mozilla/rust#12771)", r'vec::(from_fn|from_raw_parts|from_slice|from_elem|from_iter|with_capacity)', r'Vec::\1')
 fix10 = CodeFix("New vec library (cf mozilla/rust#12771)", r'use std::vec;', r'use std::vec::Vec;')
 
+def replace_freeze(matchobj):
+    if matchobj.group(0) == '':
+        return ''
+
+    macros = re.findall(r"Freeze", matchobj.group("rest"))
+    if (len(macros) > 0):
+        rest = re.sub(r"Freeze", r"Share", matchobj.group("rest"))
+        return matchobj.group('uses')+"use std::kinds::Share;\n"+rest
+    else:
+        return matchobj.group('uses') + matchobj.group("rest")
+
+fix11 = CodeFix("Replace Freeze by Share (cf mozilla/rust@12ecafb31da2d0fe4654587375b464ea4d1151b1)", r'(?P<uses>(?P<extern>use .*?;\n)+)(?P<rest>.*)', replace_freeze)
+
 fixes.append(fix)
 fixes.append(fix2)
 fixes.append(fix3)
@@ -73,3 +86,4 @@ fixes.append(fix7)
 fixes.append(fix8)
 fixes.append(fix9)
 fixes.append(fix10)
+fixes.append(fix11)
