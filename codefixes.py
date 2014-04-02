@@ -8,7 +8,7 @@ class CodeFix:
         self.replace     = replace
 
 fixes = []
-fix   = CodeFix("attribute fix", r'(#\[)(.*)(\];)', r'#![\2]')
+fix   = CodeFix("attribute fix", r'(#\[)([^\]]*?)(\];)', r'#![\2]')
 fix2  = CodeFix("priv attribute removal", r'(priv )', r'')
 fix3  = CodeFix("extern mod is obsolete", r'extern mod', r'extern crate')
 
