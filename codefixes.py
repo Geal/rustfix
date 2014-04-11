@@ -76,6 +76,28 @@ def replace_freeze(matchobj):
 
 fix11 = CodeFix("Replace Freeze by Share (cf mozilla/rust@12ecafb31da2d0fe4654587375b464ea4d1151b1)", r'(?P<uses>(?P<extern>use .*?;\n)+)(?P<rest>.*)', replace_freeze)
 
+def import_crate_libc(matchobj):
+    if matchobj.group(0) == '':
+        return ''
+    crates = Set(matchobj.group('crates').split('\n'))
+    if(len(crates) == 0):
+        return ''
+
+    macros = re.findall(r"libc", matchobj.group("rest"))
+    if (len(macros) > 0) and ("extern crate libc;" not in crates):
+        crates.add("extern crate libc;")
+
+        res = ""
+        for el in crates:
+            res += el+"\n"
+        return res + matchobj.group("rest")
+    else:
+        return matchobj.group('crates') + matchobj.group("rest")
+
+
+fix12 = CodeFix("libc is in its own crate ( cf mozilla/rust@f1f5056 )", r'(?P<crates>(?P<extern>extern crate .*?;\n)+)(?P<rest>.*)',import_crate_libc)
+fix13 = CodeFix("libc is in its own crate ( cf mozilla/rust@f1f5056 )", r'std::libc', r'libc')
+
 fixes.append(fix)
 fixes.append(fix2)
 fixes.append(fix3)
@@ -87,3 +109,5 @@ fixes.append(fix8)
 fixes.append(fix9)
 fixes.append(fix10)
 fixes.append(fix11)
+fixes.append(fix12)
+fixes.append(fix13)
